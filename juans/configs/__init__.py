@@ -121,7 +121,7 @@ def add_common_data_hparams(parent_parser):
     parser.add_argument("--num_workers", type=int, default=8)
     parser.add_argument("--pin_memory", type=ast.literal_eval, default=False)
     parser.add_argument("--persistent_workers", type=ast.literal_eval, default=True)
-    parser.add_argument("--fold", type=int, default=1)
+    parser.add_argument("--used_folds", nargs="+", default=0)
     parser.add_argument("--train_batch_size", type=int, default=10)  # [10 16p 12G], 32*8
     parser.add_argument("--valid_batch_size", type=int, default=20)  # [20 16p 12G], 32*8
     return parser
@@ -168,6 +168,8 @@ def post_process_parser(parser, use_notebook, backup_code=True, print_info=True)
         hparams.gpus = [int(hparams.gpus[0])]
     else:
         hparams.gpus = [int(gpu) for gpu in hparams.gpus[0].split(",")]
+    if isinstance(hparams.used_folds, int):
+        hparams.used_folds = [hparams.used_folds]
 
     seed_reproducer(hparams.seed)
     if hparams.message == "":
@@ -203,26 +205,28 @@ def get_trainer_parameters(hparams, print_info=True):
 
 
 class Scavenger:
-    def __init__(self, hparams, oss_expriment_folder_sync_uploader, fold_i=0, score=0) -> None:
+    def __init__(self, hparams, oss_expriment_folder_sync_uploader, score=0) -> None:
         self.hparams = hparams
         self.score = round(score, 4)
         self.oss_expriment_folder_sync_uploader = oss_expriment_folder_sync_uploader
-        self.fold_i = fold_i
+        self.used_folds = ",".join([str(i) for i in hparams.used_folds])
 
     def normal_clean(self):
         if self.hparams.oss_enable:
             # 利用产出的分值重命名oss folder
             oss_path_list = self.oss_expriment_folder_sync_uploader.oss_dir.split("/")
-            oss_path_list[-1] = f"[Fold-{self.fold_i}-{self.score }]-" + oss_path_list[-1]
+            oss_path_list[-1] = f"[Fold-{self.used_folds}-{self.score }]-" + oss_path_list[-1]
             self.oss_expriment_folder_sync_uploader.oss_dir = "/".join(oss_path_list)
             # 上传文件至OSS
+            print("oss folder path: {self.oss_expriment_folder_sync_uploader.oss_dir}")
             self.oss_expriment_folder_sync_uploader.make_oss_dir()
             self.oss_expriment_folder_sync_uploader.upload()
         else:
             # 重命名本地文件
             oss_path_list = self.hparams.experiment_location.split("/")
-            oss_path_list[-1] = f"[Fold-{self.fold_i}-{self.score}]-" + oss_path_list[-1]
+            oss_path_list[-1] = f"[Fold-{self.used_folds}-{self.score}]-" + oss_path_list[-1]
             # 重命名本地文件
+            print("local folder path: {oss_path_list}")
             os.system(f'mv {self.hparams.experiment_location} {"/".join(oss_path_list)}')
 
     def exception_clean(self):
@@ -231,6 +235,7 @@ class Scavenger:
             oss_path_list = self.oss_expriment_folder_sync_uploader.oss_dir.split("/")
             oss_path_list[-1] = "fail-" + oss_path_list[-1]
             self.oss_expriment_folder_sync_uploader.oss_dir = "/".join(oss_path_list)
+            print("oss folder path: {self.oss_expriment_folder_sync_uploader.oss_dir}")
             # 上传文件至OSS
             self.oss_expriment_folder_sync_uploader.make_oss_dir()
             self.oss_expriment_folder_sync_uploader.upload()
