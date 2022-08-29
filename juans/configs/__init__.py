@@ -218,7 +218,7 @@ class Scavenger:
             oss_path_list[-1] = f"[Fold-{self.used_folds}-{self.score }]-" + oss_path_list[-1]
             self.oss_expriment_folder_sync_uploader.oss_dir = "/".join(oss_path_list)
             # 上传文件至OSS
-            print("oss folder path: {self.oss_expriment_folder_sync_uploader.oss_dir}")
+            print(f"oss folder path: {self.oss_expriment_folder_sync_uploader.oss_dir}")
             self.oss_expriment_folder_sync_uploader.make_oss_dir()
             self.oss_expriment_folder_sync_uploader.upload()
         else:
@@ -226,7 +226,7 @@ class Scavenger:
             oss_path_list = self.hparams.experiment_location.split("/")
             oss_path_list[-1] = f"[Fold-{self.used_folds}-{self.score}]-" + oss_path_list[-1]
             # 重命名本地文件
-            print("local folder path: {oss_path_list}")
+            print(f"local folder path: {oss_path_list}")
             os.system(f'mv {self.hparams.experiment_location} {"/".join(oss_path_list)}')
 
     def exception_clean(self):
@@ -235,7 +235,7 @@ class Scavenger:
             oss_path_list = self.oss_expriment_folder_sync_uploader.oss_dir.split("/")
             oss_path_list[-1] = "fail-" + oss_path_list[-1]
             self.oss_expriment_folder_sync_uploader.oss_dir = "/".join(oss_path_list)
-            print("oss folder path: {self.oss_expriment_folder_sync_uploader.oss_dir}")
+            print(f"oss folder path: {self.oss_expriment_folder_sync_uploader.oss_dir}")
             # 上传文件至OSS
             self.oss_expriment_folder_sync_uploader.make_oss_dir()
             self.oss_expriment_folder_sync_uploader.upload()
