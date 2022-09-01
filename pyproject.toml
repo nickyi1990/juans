@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "juans"
-version = "0.0.3"
+version = "0.0.4"
 authors = [
   { name="易灿", email="972775099@qq.com"},
 ]
@@ -28,3 +28,6 @@ dependencies = [
 
 [project.urls]
 "Homepage" = "https://github.com/NickYi1990/juans"
+
+[tool.distutils.bdist_wheel]
+universal = true

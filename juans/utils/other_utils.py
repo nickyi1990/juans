@@ -64,7 +64,7 @@ def print_notebook_common_import_libs():
         "import numpy as np",
         "import torch",
         "import torch.nn as nn",
-        "import torch.nn.function as F",
+        "import torch.nn.functional as F",
     ]
     for notebook_common_import_lib in notebook_common_import_libs:
         print(notebook_common_import_lib)
