@@ -52,3 +52,19 @@ def pretty_json(hparams):
     else:
         json_hp = json.dumps(vars(hparams), indent=2)
     return "".join("\t" + line for line in json_hp.splitlines(True))
+
+
+def print_notebook_common_import_libs():
+    notebook_common_import_libs = [
+        "%load_ext autoreload",
+        "%autoreload 2",
+        "from IPython.core.display import display, HTML",
+        'display(HTML("<style>.container { width:85% !important; }</style>"))',
+        "import pandas as pd",
+        "import numpy as np",
+        "import torch",
+        "import torch.nn as nn",
+        "import torch.nn.function as F",
+    ]
+    for notebook_common_import_lib in notebook_common_import_libs:
+        print(notebook_common_import_lib)
