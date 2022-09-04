@@ -226,7 +226,7 @@ class Scavenger:
             oss_path_list = self.hparams.experiment_location.split("/")
             oss_path_list[-1] = f"[Fold-{self.used_folds}-{self.score}]-" + oss_path_list[-1]
             # 重命名本地文件
-            print(f"local folder path: {oss_path_list}")
+            print(f'local folder path: "/".join({oss_path_list})')
             os.system(f'mv {self.hparams.experiment_location} {"/".join(oss_path_list)}')
 
     def exception_clean(self):
