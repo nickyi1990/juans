@@ -41,6 +41,7 @@ class Trainer:
         gradient_clip_val=0,
         gpus="0",
         precision="mixed",
+        logger=None,
         callbacks=[],
     ) -> None:
         # 为了callback记录参数
@@ -92,7 +93,10 @@ class Trainer:
             # os.environ["CUDA_VISIBLE_DEVICES"] = ",".join([str(gpu) for gpu in self.gpus])
         if self.precision == "mixed":
             self.amp_scaler = torch.cuda.amp.GradScaler()
-        self.logger = self._configure_logger()
+        if logger is None:
+            self.logger = self._configure_logger()
+        else:
+            self.logger = logger
         self.callback_manager = CallbackManager(trainer=self, callbacks=callbacks)
         self.metrics_manager = {}
         self._tensorboard_time = 0

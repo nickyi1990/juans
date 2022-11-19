@@ -120,7 +120,7 @@ class AveragedModel(Module):
 
 
 @torch.no_grad()
-def update_bn(loader, model, model_forward_func, device=None):
+def update_bn(loader, model, model_forward_func, device=None, non_tensor_keys=[""]):
     r"""Updates BatchNorm running_mean, running_var buffers in the model.
 
     It performs one pass over data in `loader` to estimate the activation
@@ -163,8 +163,9 @@ def update_bn(loader, model, model_forward_func, device=None):
 
     for input in loader:
         for k in input:
-            if device is not None:
-                input[k] = input[k].to(device)
+            if k not in non_tensor_keys:
+                if device is not None:
+                    input[k] = input[k].to(device)
 
         model_forward_func(model=model, input=input)
 

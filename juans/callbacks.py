@@ -342,7 +342,7 @@ class LoggerCallbackTabular(Callback):
 
 
 class BWACallback(Callback):
-    def __init__(self, model, weighted_ratio, start_ratio, model_forward_func):
+    def __init__(self, model, weighted_ratio, start_ratio, model_forward_func, non_tensor_keys=[""]):
         """_summary_
 
         Args:
@@ -356,6 +356,7 @@ class BWACallback(Callback):
         super().__init__()
         self.priority = 1
         # 参数加权的策略
+        self.non_tensor_keys = non_tensor_keys
         self.ema_avg = (
             lambda averaged_model_parameter, model_parameter, num_averaged: (1 - weighted_ratio)
             * averaged_model_parameter
@@ -380,6 +381,7 @@ class BWACallback(Callback):
             self.bwa_model,
             model_forward_func=self.model_forward_func,
             device=trainer.DEVICE,
+            non_tensor_keys=self.non_tensor_keys,
         )
         # 我这里会给trainer一个信号去保存bwa的最后一个权重, 中间的权重不会做任何保存
         trainer.save_bwa_model = True
@@ -481,10 +483,9 @@ class ModelCheckpointCallback(Callback):
             for file_name in list(Path(self.dirpath).iterdir())
             if ((os.path.getctime(str(file_name)) >= self.current_time) and ("last.ckpt" not in str(file_name)))
         ]
-        avaliable_ckpt_paths = [path for path in ckpt_paths if path in avaliable_paths]
+        avaliable_ckpt_paths = [path for path in ckpt_paths if path.replace("./", "") in avaliable_paths]
         saved_ckpt_paths = sorted(avaliable_ckpt_paths, key=os.path.getctime)[-self.save_top_k :]
         deleted_model_paths = set(avaliable_ckpt_paths).difference(saved_ckpt_paths)
-
         for path in deleted_model_paths:
             os.remove(path)
 

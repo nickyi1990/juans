@@ -10,6 +10,7 @@ import torch
 class FGM:
     def __init__(self, trainer, emb_name="word_embeddings.", epsilon=1e-8):
         """https://zhuanlan.zhihu.com/p/103593948
+            Fast Gradient Metho
             做的事情就是在输入数据不变的情况下将原本的梯度g, 改为g_hat
             1.计算x的前向loss、反向传播得到梯度 (backward, 这个一般在外部进行)
             2.根据embedding矩阵的梯度计算出r, 并加到当前embedding上, 相当于x+r (attack)
@@ -169,11 +170,14 @@ class PGD:
 
 class AWP:
     """
-    Args:
-    adv_param (str): 要攻击的layer name,一般攻击第一层或者全部weight参数效果较好
-    adv_lr (float): 攻击步长,这个参数相对难调节,如果只攻击第一层embedding,一般用1比较好,全部参数用0.1比较好。
-    adv_eps (float): 参数扰动最大幅度限制,范围(0~ +∞),一般设置(0,1)之间相对合理一点。
-    adv_step (int): PGD 攻击次数的实现,一般一次攻击既可以有相对不错的效果,多步攻击需要精调adv_lr。
+        Args:
+        adv_param (str): 要攻击的layer name,一般攻击第一层或者全部weight参数效果较好
+        adv_lr (float): 攻击步长,这个参数相对难调节,如果只攻击第一层embedding,一般用1比较好,全部参数用0.1比较好。
+        adv_eps (float): 参数扰动最大幅度限制,范围(0~ +∞),一般设置(0,1)之间相对合理一点。
+        adv_step (int): PGD 攻击次数的实现,一般一次攻击既可以有相对不错的效果,多步攻击需要精调adv_lr。
+
+        paper: https://arxiv.org/abs/2004.05884 (Adversarial Weight Perturbation Helps Robust Generalization
+    )
     """
 
     def __init__(

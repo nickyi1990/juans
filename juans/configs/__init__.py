@@ -168,9 +168,10 @@ def post_process_parser(parser, use_notebook, backup_code=True, print_info=True)
         hparams.gpus = [int(hparams.gpus[0])]
     else:
         hparams.gpus = [int(gpu) for gpu in hparams.gpus[0].split(",")]
+    print(hparams.used_folds)
     if isinstance(hparams.used_folds, int):
         hparams.used_folds = [hparams.used_folds]
-
+    print(hparams.used_folds)
     seed_reproducer(hparams.seed)
     if hparams.message == "":
         hparams.folder_name = get_current_time()[5:] + "-" + hparams.model_name
