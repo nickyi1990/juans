@@ -64,7 +64,11 @@ def print_notebook_common_import_libs():
         "import numpy as np",
         "import torch",
         "import torch.nn as nn",
+        "import joblib",
+        "import os",
         "import torch.nn.functional as F",
+        'pd.set_option("display.max_columns", 200)',
+        'pd.set_option("display.max_rows", 200)',
     ]
     for notebook_common_import_lib in notebook_common_import_libs:
         print(notebook_common_import_lib)
