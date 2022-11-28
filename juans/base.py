@@ -97,6 +97,7 @@ class Trainer:
             self.logger = self._configure_logger()
         else:
             self.logger = logger
+        self.logger.info(f"logger level : {logger.handlers[0].level}")
         self.callback_manager = CallbackManager(trainer=self, callbacks=callbacks)
         self.metrics_manager = {}
         self._tensorboard_time = 0
@@ -372,8 +373,9 @@ class Trainer:
             # Step-3: 计算当前批次样本量
             try:
                 batch_size = batch[list(batch.keys())[0]].shape[0]
-            except AttributeError:
+            except Exception:
                 # batch的第一个元素可能是id组成的list
+                self.logger.debug(f"batch keys: {batch.keys()}")
                 batch_size = len(batch[list(batch.keys())[0]])
 
             # Step-4: 计算一个batch
@@ -466,7 +468,8 @@ class Trainer:
                     # Step-2: 计算当前批次样本量
                     try:
                         batch_size = batch[list(batch.keys())[0]].shape[0]
-                    except AttributeError:
+                    except Exception:
+                        self.logger.debug(f"batch keys: {batch.keys()}")
                         # batch的第一个元素可能是id组成的list
                         batch_size = len(batch[list(batch.keys())[0]])
 
