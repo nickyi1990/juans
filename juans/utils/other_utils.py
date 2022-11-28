@@ -58,6 +58,7 @@ def print_notebook_common_import_libs():
     notebook_common_import_libs = [
         "%load_ext autoreload",
         "%autoreload 2",
+        "%matplotlib inline",
         "from IPython.core.display import display, HTML",
         'display(HTML("<style>.container { width:85% !important; }</style>"))',
         "import pandas as pd",
@@ -66,7 +67,13 @@ def print_notebook_common_import_libs():
         "import torch.nn as nn",
         "import joblib",
         "import os",
+        "from pathlib import Path",
+        "from tqdm import tqdm",
+        "from albumentations.pytorch import ToTensorV2",
+        "import albumentations as A",
+        "import matplotlib.pyplot as plt",
         "import torch.nn.functional as F",
+        "from torch.utils.data import Dataset, DataLoader",
         'pd.set_option("display.max_columns", 200)',
         'pd.set_option("display.max_rows", 200)',
     ]

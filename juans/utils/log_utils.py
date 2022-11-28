@@ -17,7 +17,7 @@ level_map = {
     "info": logging.INFO,
     "warning": logging.warning,
     "error": logging.ERROR,
-    "critircal": logging.CRITICAL,
+    "critical": logging.CRITICAL,
 }
 
 
@@ -117,13 +117,13 @@ def set_logger_level(logger, level="info"):
     Parameters
     ----------
     logger : python logger对象
-        待修改level的logger
+        待修改level的logger, 设置debug则会print debug -> critical的所有信息
     level : str, optional, by default "info"
         "debug": logging.DEBUG
         "info": logging.INFO
         "warning": logging.warning
         "error": logging.ERROR
-        "critircal": logging.CRITICAL
+        "critical": logging.CRITICAL
     """
     logger.setLevel(level_map[level])
     for h in logger.handlers:
