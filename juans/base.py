@@ -435,6 +435,10 @@ class Trainer:
                         if self.global_step > self.max_steps:
                             raise NotImplemented("仅仅用来测试最佳的valid batch_size大小")
             start_time = timer()
+
+            if batch_idx / self.num_train_batches > self.max_epochs:
+                # 快速实验迭代，允许只跑很小的一部分epoch
+                break
         self.callback_manager.on_train_epoch_end()
         # tensorboard 记录 histogram 会很花时间, 特地来记录, 默认记录 histogram 只会放在 on_train_epoch_end 后
         self._tensorboard_time = round(timer() - start_time, 1)

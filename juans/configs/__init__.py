@@ -136,7 +136,7 @@ def add_common_model_hparams(parent_parser):
 
 def add_common_trainer_hparams(parent_parser):
     parser = ArgumentParser(parents=[parent_parser], add_help=False)
-    parser.add_argument("--max_epochs", type=int, default=100)
+    parser.add_argument("--max_epochs", type=float, default=100)
     parser.add_argument("--gradient_clip_val", type=float, default=1)
     parser.add_argument("--gpus", nargs="+", default="0")
     parser.add_argument("--optimizer_info", type=str, default='adamw~{"lr":2e-5}')
