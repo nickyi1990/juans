@@ -135,7 +135,7 @@ class CallbackManager(object):
 
 
 class LoggerCallback(Callback):
-    def __init__(self, detail=False, monitor=None, enable_progress_bar=False):
+    def __init__(self, detail=False, monitor=None, gpu_index=0, enable_progress_bar=False):
         super().__init__()
         self.detail = detail
         self.monitor = monitor
@@ -143,7 +143,7 @@ class LoggerCallback(Callback):
         self.start_time = timer()
         try:
             nvidia_smi.nvmlInit()
-            self.handle = nvidia_smi.nvmlDeviceGetHandleByIndex(0)
+            self.handle = nvidia_smi.nvmlDeviceGetHandleByIndex(gpu_index)
         except Exception:
             self.handle = None
         self.gb = 1024 * 1024 * 1024
