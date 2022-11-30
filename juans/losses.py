@@ -61,3 +61,18 @@ class Poly1CrossEntropyLoss(nn.Module):
         elif self.reduction == "sum":
             poly1 = poly1.sum()
         return poly1
+
+
+class LSBCEWithLogitsLoss(nn.Module):
+    def __init__(self, smoothing=0.0, dim=-1):
+        super().__init__()
+        self.confidence = 1.0 - smoothing
+        self.smoothing = smoothing
+        self.dim = dim
+
+    def forward(self, input, target):
+        with torch.no_grad():
+            true_dist = torch.zeros_like(input)
+            true_dist.fill_(self.smoothing)
+            true_dist = (target - true_dist).abs()
+        return F.binary_cross_entropy_with_logits(input, true_dist)
