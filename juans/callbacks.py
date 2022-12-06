@@ -117,6 +117,14 @@ class CallbackManager(object):
         for callback in self.callbacks:
             callback.on_valid_batch_end(trainer=self.trainer)
 
+    def on_test_batch_begin(self):
+        for callback in self.callbacks:
+            callback.on_test_batch_begin(trainer=self.trainer)
+
+    def on_test_batch_end(self):
+        for callback in self.callbacks:
+            callback.on_test_batch_end(trainer=self.trainer)
+
     def on_train_epoch_begin(self):
         for callback in self.callbacks:
             callback.on_train_epoch_begin(trainer=self.trainer)
@@ -132,6 +140,14 @@ class CallbackManager(object):
     def on_valid_epoch_end(self):
         for callback in self.callbacks:
             callback.on_valid_epoch_end(trainer=self.trainer)
+
+    def on_test_epoch_begin(self):
+        for callback in self.callbacks:
+            callback.on_test_epoch_begin(trainer=self.trainer)
+
+    def on_test_epoch_end(self):
+        for callback in self.callbacks:
+            callback.on_test_epoch_end(trainer=self.trainer)
 
 
 class LoggerCallback(Callback):
