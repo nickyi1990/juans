@@ -97,7 +97,7 @@ class Trainer:
             self.logger = self._configure_logger()
         else:
             self.logger = logger
-        self.logger.info(f"logger level : {logger.handlers[0].level}")
+            self.logger.info(f"logger level : {logger.handlers[0].level}")
         self.callback_manager = CallbackManager(trainer=self, callbacks=callbacks)
         self.metrics_manager = {}
         self._tensorboard_time = 0
@@ -582,7 +582,8 @@ class Trainer:
                 # Step-11: 更新计算整个batch的平均时间
                 self.test_batch_time.update(value=timer() - start_time)
                 start_time = timer()
-                self.callback_manager.on_valid_batch_end()
+                # self.callback_manager.on_valid_batch_end()
+                self.callback_manager.on_test_batch_end()
             if with_flag is True:
                 self.metrics_manager["test_loss"] = self.test_loss.avg
             return self.on_test_epoch_end(outputs)
