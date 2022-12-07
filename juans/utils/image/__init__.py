@@ -7,6 +7,9 @@
 import cv2
 import matplotlib
 import matplotlib.pyplot as plt
+from PIL import Image
+import requests
+import numpy as np
 
 
 def read_image(image_path):
@@ -14,7 +17,10 @@ def read_image(image_path):
     32.2 ms ± 2.34 ms -> self
     48.7 ms ± 2.24 ms -> plt.imread(image_path)
     """
-    return cv2.cvtColor(cv2.imread(image_path), cv2.COLOR_BGR2RGB)
+    try:
+        return cv2.cvtColor(cv2.imread(image_path), cv2.COLOR_BGR2RGB)
+    except Exception:
+        return np.array(Image.open(requests.get(image_path, stream=True).raw).convert(mode="RGB"))
 
 
 def show_image(image_path, title=None, fig_size=(10, 5), font_size=12, ax=None):
