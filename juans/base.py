@@ -32,6 +32,7 @@ class Trainer:
         experiment_location=None,
         current_valid_fold=0,
         max_epochs=100,
+        max_valid_batches=0,
         max_steps=None,
         num_eval_steps=20,
         optimizer_info='adamw~{"lr":2e-5}',
@@ -51,6 +52,7 @@ class Trainer:
         self.num_eval_steps = num_eval_steps
         self.global_step = 0
         self.max_steps = max_steps
+        self.max_valid_batches = max_valid_batches
         self.current_epoch = 0
         self.gpus = gpus
         self.precision = precision
@@ -358,6 +360,7 @@ class Trainer:
         self.train_batch_time = AverageMeter()  # forward prop + back prop time tracker
         self.train_load_time = AverageMeter()  # data loading time tracker
         self.num_train_batches = len(train_dataloader)
+        self.num_valid_batches = len(valid_dataloader)
         start_time = timer()
         # todo 实现在整个epoch level求metric的功能
         for batch_idx, batch in enumerate(train_dataloader):
@@ -504,6 +507,9 @@ class Trainer:
                     self.valid_batch_time.update(value=timer() - start_time)
                     start_time = timer()
                     self.callback_manager.on_valid_batch_end()
+                    if self.max_valid_batches > 0:
+                        if batch_idx > self.max_valid_batches:
+                            break
                 self.metrics_manager["valid_loss"] = self.valid_loss.avg
                 self.on_valid_epoch_end(outputs)
                 self.callback_manager.on_valid_epoch_end()

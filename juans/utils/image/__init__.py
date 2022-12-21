@@ -10,13 +10,16 @@ import matplotlib.pyplot as plt
 from PIL import Image
 import requests
 import numpy as np
+from io import BytesIO
 
 
 def read_image(image_path):
-    """读取图像数据，并转换为RGB格式
-    32.2 ms ± 2.34 ms -> self
-    48.7 ms ± 2.24 ms -> plt.imread(image_path)
+    """读取图像数据, 转换为RGB格式, 最终转换为numpy array
+    image_path: 可以为网络url, 本地path, bytes
+    return: numpy array
     """
+    if isinstance(image_path, bytes):
+        return np.array(Image.open(BytesIO(image_path)).convert(mode="RGB"))
     try:
         return cv2.cvtColor(cv2.imread(image_path), cv2.COLOR_BGR2RGB)
     except Exception:

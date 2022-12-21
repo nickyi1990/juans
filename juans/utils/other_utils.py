@@ -69,6 +69,7 @@ def print_notebook_common_import_libs():
         "import torch",
         "import torch.nn as nn",
         "import torch.nn.functional as F",
+        "from pathlib import Path",
         "from tqdm import tqdm",
         'pd.set_option("display.max_columns", 200)',
         'pd.set_option("display.max_rows", 200)',
