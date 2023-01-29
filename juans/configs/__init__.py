@@ -194,6 +194,7 @@ def get_trainer_parameters(hparams, print_info=True):
         "num_eval_steps": hparams.num_eval_steps,
         "optimizer_info": hparams.optimizer_info,
         "scheduler_info": hparams.scheduler_info,
+        "max_valid_batches": hparams.max_valid_batches,
         "attacker_info": hparams.attacker_info,
         "r_drop_info": hparams.r_drop_info,
         "gradient_clip_val": hparams.gradient_clip_val,
