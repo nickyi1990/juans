@@ -33,7 +33,6 @@ class Trainer:
         current_valid_fold=0,
         max_epochs=100,
         max_valid_batches=0,
-        max_steps=None,
         num_eval_steps=20,
         optimizer_info='adamw~{"lr":2e-5}',
         scheduler_info="constant~{}",
@@ -51,7 +50,6 @@ class Trainer:
         self.max_epochs = max_epochs
         self.num_eval_steps = num_eval_steps
         self.global_step = 0
-        self.max_steps = max_steps
         self.max_valid_batches = max_valid_batches
         self.current_epoch = 0
         self.gpus = gpus
@@ -434,9 +432,6 @@ class Trainer:
                 # todo 这个逻辑是每隔 num_eval_steps 轮，不是每增加N轮
                 if self.global_step % self.num_eval_steps == 0:
                     self._valid_one_epoch(dataloader=valid_dataloader)
-                    if self.max_steps is not None:
-                        if self.global_step > self.max_steps:
-                            raise NotImplemented("仅仅用来测试最佳的valid batch_size大小")
             start_time = timer()
 
             if batch_idx / self.num_train_batches > self.max_epochs:

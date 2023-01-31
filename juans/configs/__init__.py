@@ -136,7 +136,8 @@ def add_common_model_hparams(parent_parser):
 
 def add_common_trainer_hparams(parent_parser):
     parser = ArgumentParser(parents=[parent_parser], add_help=False)
-    parser.add_argument("--max_epochs", type=float, default=100)
+    parser.add_argument("--max_epochs", type=float, default=100, help="最大迭代epoch数量, 可设置为小数, 方便快速实验")
+    parser.add_argument("--max_valid_batches", type=int, default=0)
     parser.add_argument("--gradient_clip_val", type=float, default=1)
     parser.add_argument("--gpus", nargs="+", default="0")
     parser.add_argument("--optimizer_info", type=str, default='adamw~{"lr":2e-5}')
@@ -147,7 +148,7 @@ def add_common_trainer_hparams(parent_parser):
     parser.add_argument("--bwa_info", type=str, default='{"start_ratio":0.8, "weighted_ratio":0.5}')
     parser.add_argument("--r_drop_info", type=str, default='{"start_ratio":np.inf, "alpha": 0.3}')
     parser.add_argument("--precision", type=str, default="mixed")
-    parser.add_argument("--num_eval_steps", type=int, default=0)
+    parser.add_argument("--num_eval_steps", type=int, default=0, help="多少step评估一次, ")
     # ModelCheckpoint
     parser.add_argument("--save_top_k", type=int, default=1)
     parser.add_argument("--monitor", type=str, default="valid_loss")
@@ -168,10 +169,10 @@ def post_process_parser(parser, use_notebook, backup_code=True, print_info=True)
         hparams.gpus = [int(hparams.gpus[0])]
     else:
         hparams.gpus = [int(gpu) for gpu in hparams.gpus[0].split(",")]
-    print(hparams.used_folds)
+    # print(hparams.used_folds)
     if isinstance(hparams.used_folds, int):
         hparams.used_folds = [hparams.used_folds]
-    print(hparams.used_folds)
+    # print(hparams.used_folds)
     seed_reproducer(hparams.seed)
     if hparams.message == "":
         hparams.folder_name = get_current_time()[5:] + "-" + hparams.model_name
@@ -207,7 +208,7 @@ def get_trainer_parameters(hparams, print_info=True):
 
 
 class Scavenger:
-    def __init__(self, hparams, oss_expriment_folder_sync_uploader, score=0) -> None:
+    def __init__(self, hparams, oss_expriment_folder_sync_uploader=None, score=0) -> None:
         self.hparams = hparams
         self.score = round(score, 4)
         self.oss_expriment_folder_sync_uploader = oss_expriment_folder_sync_uploader
@@ -241,3 +242,10 @@ class Scavenger:
             # 上传文件至OSS
             self.oss_expriment_folder_sync_uploader.make_oss_dir()
             self.oss_expriment_folder_sync_uploader.upload()
+        else:
+            # 重命名本地文件
+            oss_path_list = self.hparams.experiment_location.split("/")
+            oss_path_list[-1] = f"fail-" + oss_path_list[-1]
+            # 重命名本地文件
+            print(f'local folder path: "/".join({oss_path_list})')
+            os.system(f'mv {self.hparams.experiment_location} {"/".join(oss_path_list)}')
