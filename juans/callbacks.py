@@ -464,7 +464,9 @@ class ModelCheckpointCallback(Callback):
 
     def on_valid_epoch_end(self, trainer):
         # print(f"save_bwa_model: {trainer.save_bwa_model}")
-        if self.monitor_op(trainer.metrics_manager[self.monitor], self.best_loss_or_score):
+        if self.monitor_op(trainer.metrics_manager[self.monitor], self.best_loss_or_score) or np.equal(
+            trainer.metrics_manager[self.monitor], self.best_loss_or_score
+        ):
             self._auto_rename_filename(trainer=trainer)
             self._smart_save(trainer=trainer)
             self._keep_latest_checkpoint()

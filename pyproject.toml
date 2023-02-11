@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "juans"
-version = "0.0.7"
+version = "0.0.9"
 authors = [
   { name="易灿", email="972775099@qq.com"},
 ]
@@ -24,6 +24,9 @@ dependencies = [
         "matplotlib>=3.5.1",
         "numpy>=1.21.6",
         "nvidia-ml-py3",
+        "requests>=2.26.0",
+        "Pillow>=7.2.0",
+        "setuptools>=59.5.0"
     ]
 
 [project.urls]

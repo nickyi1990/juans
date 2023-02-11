@@ -21,7 +21,8 @@ def read_image(image_path):
     if isinstance(image_path, bytes):
         return np.array(Image.open(BytesIO(image_path)).convert(mode="RGB"))
     try:
-        return cv2.cvtColor(cv2.imread(image_path), cv2.COLOR_BGR2RGB)
+        return np.array(Image.open(image_path).convert(mode="RGB"))
+        # return cv2.cvtColor(cv2.imread(image_path), cv2.COLOR_BGR2RGB)
     except Exception:
         return np.array(Image.open(requests.get(image_path, stream=True).raw).convert(mode="RGB"))
 

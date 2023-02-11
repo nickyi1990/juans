@@ -358,7 +358,6 @@ class Trainer:
         self.train_batch_time = AverageMeter()  # forward prop + back prop time tracker
         self.train_load_time = AverageMeter()  # data loading time tracker
         self.num_train_batches = len(train_dataloader)
-        self.num_valid_batches = len(valid_dataloader)
         start_time = timer()
         # todo 实现在整个epoch level求metric的功能
         for batch_idx, batch in enumerate(train_dataloader):
@@ -449,17 +448,20 @@ class Trainer:
         # ========================================================================================================
         # 定义模型效果跟踪指标
         # ========================================================================================================
-        if dataloader is None:
-            pass
-        else:
+        # if dataloader is None:
+        #     self.callback_manager.on_valid_epoch_end()
+        #     self.metrics_manager["valid_loss"] = self.valid_loss.avg
+        # else:
+
+        outputs = []
+        self.valid_loss = AverageMeter()  # loss tracker
+        self.valid_batch_time = AverageMeter()  # forward prop + back prop time tracker
+        self.valid_load_time = AverageMeter()  # data loading time tracker
+        if dataloader is not None:
             self.model.eval()
             self.num_valid_batches = len(dataloader)
             # todo 实现在整个epoch level求metric的功能
             with torch.no_grad():
-                self.valid_loss = AverageMeter()  # loss tracker
-                self.valid_batch_time = AverageMeter()  # forward prop + back prop time tracker
-                self.valid_load_time = AverageMeter()  # data loading time tracker
-                outputs = []
                 start_time = timer()
                 for batch_idx, batch in enumerate(dataloader):
                     self.valid_batch_idx = batch_idx
@@ -494,9 +496,7 @@ class Trainer:
                     try:
                         self.valid_loss.update(value=batch_output["loss"].item(), n=batch_size)
                     except Exception:
-                        raise ValueError(
-                            'key "loss" should in the output of validation_step, and the output of train step should be a dict'
-                        )
+                        pass
 
                     # Step-11: 更新计算整个batch的平均时间
                     self.valid_batch_time.update(value=timer() - start_time)
@@ -505,11 +505,15 @@ class Trainer:
                     if self.max_valid_batches > 0:
                         if batch_idx > self.max_valid_batches:
                             break
-                self.metrics_manager["valid_loss"] = self.valid_loss.avg
-                self.on_valid_epoch_end(outputs)
-                self.callback_manager.on_valid_epoch_end()
-                self._tensorboard_time = 0
-            self.model.train()
+        try:
+            self.metrics_manager["valid_loss"] = self.valid_loss.avg
+        except Exception:
+            # 如果不计算valid_loss, 默认填充为0
+            self.metrics_manager["valid_loss"] = 0
+        self.on_valid_epoch_end(outputs)
+        self.callback_manager.on_valid_epoch_end()
+        self._tensorboard_time = 0
+        self.model.train()
 
     def on_train_epoch_end(self):
         # 暂时先不做实现，用不到，实现方式和on_valid_epoch_end类似
