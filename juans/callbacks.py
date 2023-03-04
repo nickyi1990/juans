@@ -779,12 +779,14 @@ class OssSync:
 
 
 class Download2OssCallback(Callback):
-    def __init__(self, osync):
+    def __init__(self, osync, upload_oss_on_train_epoch_end):
         super().__init__()
         self.osync = osync
+        self.upload_oss_on_train_epoch_end = upload_oss_on_train_epoch_end
 
-    # def on_train_epoch_end(self, trainer):
-    #     self.osync.upload()
+    def on_train_epoch_end(self, trainer):
+        if self.upload_oss_on_train_epoch_end is True:
+            self.osync.upload()
 
     def on_train_end(self, trainer):
         self.osync.upload()

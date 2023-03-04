@@ -11,7 +11,7 @@ def get_folder_size(dir_path="."):
     return round(size / 1024 / 1024, 2)
 
 
-def list_files(dir_path, suffix=["jfif", "jpg", "png"]):
+def list_files(dir_path, suffix=["jfif", "jpg", "png", "jpeg"]):
     """获取dir_pathwen文件夹及子文件夹下所有满足suffix尾缀的文件名"""
     file_names = []
     # root是subfolder

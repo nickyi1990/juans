@@ -4,13 +4,34 @@
  Last Modified by:   yican.yc
  Last Modified time: 2022-08-23 19:24:05
 """
+import base64
+from io import BytesIO
+from pathlib import Path
+
 import cv2
 import matplotlib
 import matplotlib.pyplot as plt
-from PIL import Image
-import requests
 import numpy as np
-from io import BytesIO
+import requests
+from PIL import Image
+
+
+def image_to_base64_bytes(image_path):
+    with open(image_path, "rb") as image_file:
+        encoded_bytes = base64.b64encode(image_file.read())
+    return encoded_bytes
+
+
+def image_to_base64_string(image_path, encoding="ascii"):
+    return image_to_base64_bytes(image_path).decode(encoding)
+
+
+def base64_bytes_to_numpy(encoded_bytes):
+    return np.array(Image.open(BytesIO(base64.b64decode(encoded_bytes))).convert("RGB"))
+
+
+def base64_string_to_numpy(base64_string, encoding="ascii"):
+    return base64_bytes_to_numpy(base64_string.encode(encoding))
 
 
 def read_image(image_path):
@@ -60,7 +81,7 @@ def show_image(image_path, title=None, fig_size=(10, 5), font_size=12, ax=None):
         plt.imshow(read_image(image_path))
 
 
-def show_images(image_paths, titles=[], n_cols=3, fig_width=16, font_size=12):
+def show_images(image_paths, titles=[], n_cols=3, fig_width=16, font_size=12, height_ratio=1.05):
     """以网格的形式展示多幅图
 
     Parameters
@@ -89,7 +110,7 @@ def show_images(image_paths, titles=[], n_cols=3, fig_width=16, font_size=12):
     n_rows = n_rows if (n_images % n_cols == 0) else (n_rows + 1)
     img = read_image(image_paths[0])
     w_h_ratio = img.shape[1] / img.shape[0]
-    fig_size = (fig_width, (fig_width * n_rows) / (n_cols * w_h_ratio) * 1.05)
+    fig_size = (fig_width, (fig_width * n_rows) / (n_cols * w_h_ratio) * height_ratio)
 
     # 补全标题
     titles = titles + [None] * (n_images - len(titles))
@@ -100,3 +121,21 @@ def show_images(image_paths, titles=[], n_cols=3, fig_width=16, font_size=12):
 
     for i, image_path in enumerate(image_paths):
         show_image(image_path=image_path, ax=ax[i], title=titles[i], font_size=font_size)
+
+
+def show_images_under_folder(folder_path, num_of_pictures, n_cols=3, fig_width=16, font_size=12, height_ratio=1.6):
+    """
+    展示某个folder下的图片
+    """
+    p = Path(folder_path)
+    image_paths = list(p.iterdir())
+    sample_image_paths = image_paths[:num_of_pictures]
+    print(f"total images : {len(image_paths)}")
+    show_images(
+        sample_image_paths,
+        titles=[str(i).split("/")[-1] for i in sample_image_paths],
+        n_cols=3,
+        fig_width=16,
+        font_size=12,
+        height_ratio=height_ratio,
+    )

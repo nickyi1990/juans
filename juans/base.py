@@ -42,6 +42,7 @@ class Trainer:
         gpus="0",
         precision="mixed",
         logger=None,
+        set_to_none=True,
         callbacks=[],
     ) -> None:
         # 为了callback记录参数
@@ -60,6 +61,7 @@ class Trainer:
         self.r_drop_info = r_drop_info
         self.attacker_used = ""
         self.r_drop_used = ""
+        self.set_to_none = set_to_none
         assert self.precision in ("mixed", "32"), "precision should in [mixed, 32]"
         # https://pytorch.org/blog/accelerating-training-on-nvidia-gpus-with-pytorch-automatic-mixed-precision/
         # https://pytorch.org/docs/stable/notes/amp_examples.html#working-with-unscaled-gradients
@@ -150,6 +152,9 @@ class Trainer:
         # self.logger.info(f"optimizer_name : {self.optimizer_name}")
         # self.logger.info(f"self.optimizer_parameters: {self.optimizer_parameters}")
         return optimizer
+
+    def _configure_scheduler(self):
+        self.configure_scheduler()
 
     def configure_scheduler(self):
         # https://www.kaggle.com/isbhargav/guide-to-pytorch-learning-rate-scheduling
@@ -322,7 +327,10 @@ class Trainer:
             start_time = timer()
             self.model = model.to(self.DEVICE)
             if len(self.gpus) > 1:
+                # https://pytorch.org/tutorials/beginner/blitz/data_parallel_tutorial.html
+                # https://pytorch.org/tutorials/beginner/ddp_series_theory.html [DP VS DDP]
                 self.model = torch.nn.DataParallel(self.model, device_ids=self.gpus)
+                # https://pytorch.org/tutorials/beginner/ddp_series_multigpu.html [DDP的具体步骤]
             self.train_dataloader = train_dataloader
             self.valid_dataloader = valid_dataloader
             self.logger.info(f"Train Batch Size : {self.train_dataloader.batch_size}")
@@ -364,8 +372,8 @@ class Trainer:
             self.train_batch_idx = batch_idx
             assert isinstance(batch, dict), "batch should be a dict"
             # Step-1: 清空梯度必须要在第一步做掉
-            self.optimizer.zero_grad()
-            # self.optimizer.zero_grad(set_to_none=True)
+            # self.optimizer.zero_grad()
+            self.optimizer.zero_grad(set_to_none=self.set_to_none)  # 减少显存使用
 
             # Step-2: 计算[一个batch数据]的加载时间
             self.train_load_time.update(value=timer() - start_time)

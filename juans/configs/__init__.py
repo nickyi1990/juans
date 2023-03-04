@@ -14,6 +14,7 @@ import torch
 
 from ..callbacks import Download2OssCallback, OssSync
 from ..utils.other_utils import get_current_time, pretty_json, seed_reproducer
+from ..utils.log_utils import timer
 
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 ROOTFolder = "."
@@ -41,6 +42,7 @@ def backup_code_folder(hparams):
     shutil.copy("run.sh", f"{hparams.experiment_location}/codes/run.sh")
 
 
+@timer
 def exchange_oss_resource(
     server_expriment_folder,
     oss_expriment_folder,
@@ -48,6 +50,7 @@ def exchange_oss_resource(
     oss_data_folder=None,
     server_weights_folder=None,
     oss_weights_folder=None,
+    upload_oss_on_train_epoch_end=False,
     current_dir="/workspace/bin",
 ):
     """
@@ -67,7 +70,9 @@ def exchange_oss_resource(
         create_oss_folder=False,
         ossutil_path=f"{current_dir}/ossutil64",
     )
-    oss_uploader_callback = Download2OssCallback(oss_expriment_folder_sync_uploader)
+    oss_uploader_callback = Download2OssCallback(
+        oss_expriment_folder_sync_uploader, upload_oss_on_train_epoch_end=upload_oss_on_train_epoch_end
+    )
 
     if oss_data_folder is not None:
         # 下载数据至服务器 server_data_folder
